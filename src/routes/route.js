@@ -13,10 +13,7 @@ router.get("/test-me", function (req, res) {
   validator.trim();
   validator.changetoLowerCase();
   validator.changeToUpperCase();
-});
-
-router.get("/test-me1", function (req, res) {
-  res.send("My second api!");
+  res.send("Assignment- Node Modules");
 });
 
 module.exports = router;
