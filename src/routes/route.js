@@ -1,41 +1,83 @@
-const express = require('express');
-const myHelper = require('../util/helper')
-const underscore = require('underscore')
+const express = require("express");
 
 const router = express.Router();
 
-router.get('/test-me', function (req, res) {
-    myHelper.printDate()
-    myHelper.getCurrentMonth()
-    myHelper.getCohortData()
-    let firstElement = underscore.first(['Sabiha','Akash','Pritesh'])
-    console.log('The first element received from underscope function is '+firstElement)
-    res.send('My first ever api!')
+let movies = [
+  "Rang de basanti",
+  "The shining",
+  "Lord of the rings",
+  "Batman begins",
+];
+
+router.get("/movies", function (req, res) {
+  res.send(movies);
 });
 
-router.get('/hello', function (req, res) {
-   
-    res.send('Hello there!')
+router.get("/movies/:indexNumber", function (req, res) {
+  let index = req.params.indexNumber;
+  if (movies[index] === undefined) res.send("Request you to use valid index!!");
+  res.send(movies[index]);
 });
 
-router.get('/candidates', function(req, res){
-    console.log('Query paramters for this request are '+JSON.stringify(req.query))
-    let gender = req.query.gender
-    let state = req.query.state
-    let district = req.query.district
-    console.log('State is '+state)
-    console.log('Gender is '+gender)
-    console.log('District is '+district)
-    let candidates = ['Akash','Suman']
-    res.send(candidates)
-})
+let films = [
+  {
+    id: 1,
+    name: "The Shining",
+  },
+  {
+    id: 2,
+    name: "Incendies",
+  },
+  {
+    id: 3,
+    name: "Rang de Basanti",
+  },
+  {
+    id: 4,
+    name: "Finding Nemo",
+  },
+];
 
-router.get('/candidates/:canidatesName', function(req, res){
-    console.log('The request objects is '+ JSON.stringify(req.params))
-    console.log('Candidates name is '+req.params.canidatesName)
-    res.send('Done')
-})
+router.get("/films", function (req, res) {
+  res.send(films);
+});
 
+router.get("/films/:filmId", function (req, res) {
+  let filmId = req.params.filmId;
+  let output = films.find((x) => x.id == filmId);
+  if (output === undefined) res.send("No movie exists with this id");
+  res.send(output);
+});
+
+router.get("/sol1", function (req, res) {
+  let arr = [1, 2, 3, 5, 6, 7];
+  let n = arr.pop();
+  let sumOfArray = arr.reduce(function (add, curr) {
+    add = add + curr;
+    return add;
+  }, 0);
+  let sumOfSequence = (n * (n + 1)) / 2;
+  let missingNumber = sumOfSequence - sumOfArray;
+  res.send("The missing number is: " + missingNumber);
+});
+
+router.get("/sol2", function (req, res) {
+  let arr = [33, 35, 36, 37, 38];
+  let last = arr[arr.length - 1];
+  let first = arr[0];
+
+  let n = arr.length + 1; // last - first + 1;
+  console.log(first, last, n);
+  let sumOfArray = arr.reduce(function (add, curr) {
+    add += curr;
+    return add;
+  }, 0);
+  console.log(sumOfArray);
+  let sumOfSequence = (n * (first + last)) / 2;
+  console.log(sumOfSequence);
+  let missingNumber = sumOfSequence - sumOfArray;
+  res.send("The missing number is: " + missingNumber);
+});
 
 module.exports = router;
 // adding this comment for no reason
