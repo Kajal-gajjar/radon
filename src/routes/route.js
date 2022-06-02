@@ -51,7 +51,7 @@ router.get("/films/:filmId", function (req, res) {
 
 router.get("/sol1", function (req, res) {
   let arr = [1, 2, 3, 5, 6, 7];
-  let n = arr.pop();
+  let n = arr[arr.length - 1];
   let sumOfArray = arr.reduce(function (add, curr) {
     add = add + curr;
     return add;
