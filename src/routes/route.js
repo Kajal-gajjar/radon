@@ -50,7 +50,7 @@ router.get("/films/:filmId", function (req, res) {
 });
 
 router.get("/sol1", function (req, res) {
-  let arr = [1, 2, 3, 5, 6, 7];
+  let arr = [1, 2, 4, 5, 6, 7];
   let n = arr[arr.length - 1];
   let sumOfArray = arr.reduce(function (add, curr) {
     add = add + curr;
@@ -62,19 +62,15 @@ router.get("/sol1", function (req, res) {
 });
 
 router.get("/sol2", function (req, res) {
-  let arr = [33, 35, 36, 37, 38];
+  let arr = [33, 34, 35, 37, 38];
   let last = arr[arr.length - 1];
   let first = arr[0];
-
   let n = arr.length + 1; // last - first + 1;
-  console.log(first, last, n);
   let sumOfArray = arr.reduce(function (add, curr) {
     add += curr;
     return add;
   }, 0);
-  console.log(sumOfArray);
-  let sumOfSequence = (n * (first + last)) / 2;
-  console.log(sumOfSequence);
+  let sumOfSequence = (n * (first + last)) / 2; //33-38
   let missingNumber = sumOfSequence - sumOfArray;
   res.send("The missing number is: " + missingNumber);
 });
