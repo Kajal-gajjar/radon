@@ -24,8 +24,9 @@ const getBooksInYear = async function (req, res) {
 
 //request to return all books who have an Indian price tag of “100INR” or “200INR” or “500INR”
 const getXINRBooks = async function (req, res) {
+  console.log(req);
   let allBooks = await bookModel.find({
-    "price.indianPrice": { $in: ["100INR", "200INR", "500INR"] },
+    "prices.indianPrice": { $in: ["100INR", "200INR", "500INR"] },
   });
   res.send(allBooks);
 };
@@ -58,11 +59,11 @@ const getParticularBooks = async function (req, res) {
     filter.authorName = authorName;
   }
 
-  let price = await bookModel.find({
-    "prices.indianPrice": prices.indianPrice,
-  });
-  if (price != undefined) {
-    filter["prices.indianPrice"] = prices.indianPrice;
+  if (prices != undefined) {
+    let price = await bookModel.find({
+      "prices.indianPrice": prices?.indianPrice,
+    });
+    filter["prices.indianPrice"] = prices?.indianPrice;
   }
 
   if (totalPages != undefined) {
