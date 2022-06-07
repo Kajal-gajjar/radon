@@ -11,7 +11,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 mongoose
   .connect(
-    "mongodb+srv://Ankita220296:Ankita704696@cluster0.d9vvv.mongodb.net/KajalGajjar-DB?retryWrites=true&w=majority",
+    "mongodb+srv://Ankita220296:Ankita704696@cluster0.d9vvv.mongodb.net/BookAuthor-DB?retryWrites=true&w=majority",
     {
       useNewUrlParser: true,
     }

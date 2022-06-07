@@ -1,96 +1,59 @@
+const authorModel = require("../models/authorModel");
 const bookModel = require("../models/bookModel");
 
-//to create a new entry..use this api to create 11+ entries in your collection
+const mapBook = (book, author) => {
+  return { price: book.price, author_name: author.author_name };
+};
+
 const createBook = async function (req, res) {
   let data = req.body;
   let savedData = await bookModel.create(data);
-  res.send({ msg: savedData });
+  res.send(savedData);
 };
 
-// gives all the books- their bookName and authorName only
-const getBookData = async function (req, res) {
-  let allBooks = await bookModel
-    .find()
-    .select({ bookName: 1, authorName: 1, _id: 0 });
-  res.send({ msg: allBooks });
+const getBooks = async function (req, res) {
+  let allBooks = await bookModel.find();
+  res.send({ allBooks });
 };
 
-//takes year as input in post request and gives list of all books published that year
-const getBooksInYear = async function (req, res) {
-  let publishedYear = req.body.year;
-  let books = await bookModel.find({ year: publishedYear });
-  res.send(books);
+const findAuthor = async function (req, res) {
+  let book = await bookModel.findOneAndUpdate(
+    { name: "Two states" },
+    { price: 100 },
+    { new: true }
+  );
+  let authorName = await authorModel.findOne({ author_id: book.author_id });
+  res.send(mapBook(book, authorName));
 };
 
-//request to return all books who have an Indian price tag of “100INR” or “200INR” or “500INR”
-const getXINRBooks = async function (req, res) {
-  console.log(req);
-  let allBooks = await bookModel.find({
-    "prices.indianPrice": { $in: ["100INR", "200INR", "500INR"] },
-  });
-  res.send(allBooks);
-};
-
-//returns books that are available in stock or have more than 500 pages
-const getRandomBooks = async function (req, res) {
-  let allBooks = await bookModel.find({
-    $or: [{ stockAvailable: true }, { totalPages: { $gt: 500 } }],
-  });
-  res.send(allBooks);
-};
-
-//take any input and use it as a condition to fetch books that satisfy that condition
-const getParticularBooks = async function (req, res) {
-  let filter = {};
-  const {
-    bookName,
-    authorName,
-    prices,
-    totalPages,
-    stockAvailable,
-    year,
-    tags,
-  } = req.body;
-
-  if (bookName != undefined) {
-    filter.bookName = bookName;
-  }
-  if (authorName != undefined) {
-    filter.authorName = authorName;
-  }
-
-  if (prices != undefined) {
-    if (prices.indianPrice != undefined)
-      filter["prices.indianPrice"] = prices.indianPrice;
-    if (prices.europePrice != undefined)
-      filter["prices.europePrice"] = prices.europePrice;
-  }
-
-  if (totalPages != undefined) {
-    filter.totalPages = totalPages;
-  }
-
-  if (stockAvailable != undefined) {
-    filter.stockAvailable = stockAvailable;
-  }
-
-  if (year != undefined) {
-    filter.year = year;
-  }
-
-  if (tags != undefined) {
-    filter.tags = { $in: tags };
-  }
-
-  let result = await bookModel.find(filter);
-  if (result.length == 0)
-    res.send("Item(s) for the entered query is not found");
-  else res.send(result);
+const findAuthorName = async function (req, res) {
+  const values = await bookModel.aggregate([
+    {
+      $match: {
+        price: { $gte: 50, $lte: 100 },
+      },
+    },
+    {
+      $lookup: {
+        from: "authors",
+        localField: "author_id",
+        foreignField: "author_id",
+        as: "AuthorDetails",
+      },
+    },
+    {
+      $project: {
+        name: 1,
+        _id: 0,
+        "AuthorDetails.author_name": 1,
+      },
+    },
+    { $unwind: "$AuthorDetails" },
+  ]);
+  res.send(values);
 };
 
 module.exports.createBook = createBook;
-module.exports.getBookData = getBookData;
-module.exports.getBooksInYear = getBooksInYear;
-module.exports.getXINRBooks = getXINRBooks;
-module.exports.getRandomBooks = getRandomBooks;
-module.exports.getParticularBooks = getParticularBooks;
+module.exports.getBooks = getBooks;
+module.exports.findAuthor = findAuthor;
+module.exports.findAuthorName = findAuthorName;
