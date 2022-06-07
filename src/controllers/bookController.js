@@ -60,10 +60,10 @@ const getParticularBooks = async function (req, res) {
   }
 
   if (prices != undefined) {
-    let price = await bookModel.find({
-      "prices.indianPrice": prices?.indianPrice,
-    });
-    filter["prices.indianPrice"] = prices?.indianPrice;
+    // let price = await bookModel.find({
+    //   "prices.indianPrice": prices?.indianPrice,
+    // });
+    filter["prices.indianPrice"] = prices.indianPrice;
   }
 
   if (totalPages != undefined) {
@@ -81,7 +81,7 @@ const getParticularBooks = async function (req, res) {
   if (tags != undefined) {
     filter.tags = { $in: tags };
   }
-  console.log(filter);
+
   let result = await bookModel.find(filter);
   res.send(result);
 };
