@@ -60,10 +60,10 @@ const getParticularBooks = async function (req, res) {
   }
 
   if (prices != undefined) {
-    // let price = await bookModel.find({
-    //   "prices.indianPrice": prices?.indianPrice,
-    // });
-    filter["prices.indianPrice"] = prices.indianPrice;
+    if (prices.indianPrice != undefined)
+      filter["prices.indianPrice"] = prices.indianPrice;
+    if (prices.europePrice != undefined)
+      filter["prices.europePrice"] = prices.europePrice;
   }
 
   if (totalPages != undefined) {
@@ -83,7 +83,9 @@ const getParticularBooks = async function (req, res) {
   }
 
   let result = await bookModel.find(filter);
-  res.send(result);
+  if (result.length == 0)
+    res.send("Item(s) for the entered query is not found");
+  else res.send(result);
 };
 
 module.exports.createBook = createBook;
