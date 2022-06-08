@@ -16,5 +16,7 @@ router.get("/getBooks", bookController.getBooks);
 router.get("/getBookByAuthor", authorController.getBookByAuthor);
 router.get("/findAuthor", bookController.findAuthor);
 router.get("/findAuthorName", bookController.findAuthorName);
+router.get("/booksByAuthorId/:author_id", bookController.booksByAuthorId);
+router.get("/authorOlderThan50", bookController.AuthorOlderThan50);
 
 module.exports = router;

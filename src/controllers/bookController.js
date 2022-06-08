@@ -53,7 +53,51 @@ const findAuthorName = async function (req, res) {
   res.send(values);
 };
 
-module.exports.createBook = createBook;
-module.exports.getBooks = getBooks;
-module.exports.findAuthor = findAuthor;
-module.exports.findAuthorName = findAuthorName;
+const booksByAuthorId = async function (req, res) {
+  let id = req.params.author_id;
+  const result = await bookModel
+    .find({ author_id: id })
+    .select({ name: 1, _id: 0 });
+  res.send(result);
+};
+
+const AuthorOlderThan50 = async function (req, res) {
+  let author = await bookModel.aggregate([
+    {
+      $lookup: {
+        from: "authors",
+        localField: "author_id",
+        foreignField: "author_id",
+        as: "AuthorDetails",
+      },
+    },
+    {
+      $match: { "AuthorDetails.age": { $gt: 50 }, ratings: { $gt: 4 } },
+    },
+    {
+      $group: {
+        _id: "$AuthorDetails._id",
+        author_name: { $first: "$AuthorDetails.author_name" },
+        age: { $first: "$AuthorDetails.age" },
+      },
+    },
+    { $unwind: "$_id" },
+    { $unwind: "$author_name" },
+    { $unwind: "$age" },
+    {
+      $project: {
+        _id: 0,
+      },
+    },
+  ]);
+  res.send(author);
+};
+
+module.exports = {
+  createBook,
+  getBooks,
+  findAuthor,
+  findAuthorName,
+  booksByAuthorId,
+  AuthorOlderThan50,
+};
