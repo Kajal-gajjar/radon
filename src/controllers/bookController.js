@@ -1,103 +1,66 @@
 const authorModel = require("../models/authorModel");
 const bookModel = require("../models/bookModel");
-
-const mapBook = (book, author) => {
-  return { price: book.price, author_name: author.author_name };
-};
+const publisherModel = require("../models/publisherModel");
 
 const createBook = async function (req, res) {
   let data = req.body;
+  console.log(data);
+  if (!data.author) res.send("Please enter the Author ID");
+  let author = await authorModel.findById(data.author);
+  if (!author) res.send("Entered Author ID is not valid");
+
+  if (!data.publisher) res.send("Please enter the Publisher ID");
+  let publisher = await publisherModel.findById(data.publisher);
+  if (!publisher) res.send("Entered Publisher ID is not valid");
+
   let savedData = await bookModel.create(data);
   res.send(savedData);
 };
 
 const getBooks = async function (req, res) {
-  let allBooks = await bookModel.find();
+  let allBooks = await bookModel
+    .find()
+    .populate("author")
+    .populate("publisher");
   res.send({ allBooks });
 };
 
-const findAuthor = async function (req, res) {
-  let book = await bookModel.findOneAndUpdate(
-    { name: "Two states" },
-    { price: 100 },
-    { new: true }
+const updateBookCover = async function (req, res) {
+  let data = await publisherModel
+    .find({
+      name: { $in: ["Penguin", "HarperCollins"] },
+    })
+    .select({ _id: 1 });
+  let publisherId = data.map((x) => x._id);
+  let book = await bookModel.updateMany(
+    { publisher: { $in: publisherId } },
+    { $set: { isHardCover: true } }
   );
-  let authorName = await authorModel.findOne({ author_id: book.author_id });
-  res.send(mapBook(book, authorName));
+
+  let allBooks = await bookModel
+    .find({ isHardCover: true })
+    .populate(["author", "publisher"]);
+  res.send({ allBooks });
 };
 
-const findAuthorName = async function (req, res) {
-  const values = await bookModel.aggregate([
-    {
-      $match: {
-        price: { $gte: 50, $lte: 100 },
-      },
-    },
-    {
-      $lookup: {
-        from: "authors",
-        localField: "author_id",
-        foreignField: "author_id",
-        as: "AuthorDetails",
-      },
-    },
-    {
-      $project: {
-        name: 1,
-        _id: 0,
-        "AuthorDetails.author_name": 1,
-      },
-    },
-    { $unwind: "$AuthorDetails" },
-  ]);
-  res.send(values);
-};
+const updatePrice = async function (req, res) {
+  let authorRating = await authorModel
+    .find({ rating: { $gt: 3.5 } })
+    .select({ _id: 1 });
 
-const booksByAuthorId = async function (req, res) {
-  let id = req.params.author_id;
-  const result = await bookModel
-    .find({ author_id: id })
-    .select({ name: 1, _id: 0 });
-  res.send(result);
-};
+  let authorID = authorRating.map((x) => x._id);
+  let book = await bookModel.updateMany(
+    { author: { $in: authorID } },
+    { $inc: { price: 10 } }
+  );
 
-const AuthorOlderThan50 = async function (req, res) {
-  let author = await bookModel.aggregate([
-    {
-      $lookup: {
-        from: "authors",
-        localField: "author_id",
-        foreignField: "author_id",
-        as: "AuthorDetails",
-      },
-    },
-    {
-      $match: { "AuthorDetails.age": { $gt: 50 }, ratings: { $gt: 4 } },
-    },
-    {
-      $group: {
-        _id: "$AuthorDetails._id",
-        author_name: { $first: "$AuthorDetails.author_name" },
-        age: { $first: "$AuthorDetails.age" },
-      },
-    },
-    { $unwind: "$_id" },
-    { $unwind: "$author_name" },
-    { $unwind: "$age" },
-    {
-      $project: {
-        _id: 0,
-      },
-    },
-  ]);
-  res.send(author);
+  let allBooks = await bookModel.find({ author: { $in: authorID } });
+  res.send({ allBooks });
 };
 
 module.exports = {
   createBook,
   getBooks,
-  findAuthor,
-  findAuthorName,
-  booksByAuthorId,
-  AuthorOlderThan50,
+  updateBookCover,
+  updatePrice,
 };
