@@ -49,10 +49,9 @@ const updatePrice = async function (req, res) {
     .select({ _id: 1 });
 
   let authorID = authorRating.map((x) => x._id);
-  let book = await bookModel.updateMany(
-    { author: { $in: authorID } },
-    { $inc: { price: 10 } }
-  );
+  let book = await bookModel
+    .find({ author: { $in: authorID } })
+    .update({ $inc: { price: 10 } });
 
   let allBooks = await bookModel.find({ author: { $in: authorID } });
   res.send({ allBooks });

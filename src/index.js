@@ -2,6 +2,7 @@ const express = require("express");
 var bodyParser = require("body-parser");
 
 const route = require("./routes/route.js");
+const middleware = require("./middleware/middleware");
 const { default: mongoose } = require("mongoose");
 
 const app = express();
@@ -19,7 +20,7 @@ mongoose
   .then(() => console.log("MongoDb connected"))
   .catch((err) => console.log(err));
 
-app.use("/", route);
+app.use("/", middleware.mid, route);
 
 app.listen(process.env.PORT || 3000, function () {
   console.log("Express app running on port " + (process.env.PORT || 3000));
