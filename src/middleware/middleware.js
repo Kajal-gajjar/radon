@@ -1,11 +1,11 @@
-const moment = require("moment");
-
-const mid = function (req, res, next) {
-  let time = moment().format("YYYY-MM-DD hh:mm:ss");
-  let ip = req.ip;
-  let path = req.path;
-  console.log(time, ip, path);
-  next();
+const isFreeAppUser = function (req, res, next) {
+  const { isfreeappuser } = req.headers;
+  if (isfreeappuser === undefined || isfreeappuser === "")
+    res.send("The request is missing a mandatory header");
+  else {
+    req.isFreeAppUser = isfreeappuser;
+    next();
+  }
 };
 
-module.exports.mid = mid;
+module.exports.isFreeAppUser = isFreeAppUser;

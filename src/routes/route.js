@@ -1,22 +1,24 @@
 const express = require("express");
-const bookController = require("../controllers/bookController");
-const authorController = require("../controllers/authorController");
-const publisherController = require("../controllers/publisherController");
+const {
+  createProduct,
+  getProduct,
+} = require("../controllers/productController");
+const { createUser, getUsers } = require("../controllers/userController");
+const { createOrder, getOrder } = require("../controllers/orderController");
+const { isFreeAppUser } = require("../middleware/middleware");
+
 const router = express.Router();
 
-router.get("/test-me", function (req, res) {
-  res.send("My first ever api!");
-});
+// routes for products
+router.post("/createProduct", createProduct);
+router.get("/getProduct", getProduct);
 
-router.post("/createBook", bookController.createBook);
-router.post("/createAuthor", authorController.createAuthor);
-router.post("/createPublisher", publisherController.createPublisher);
+// routes for users
+router.post("/createUser", isFreeAppUser, createUser);
+router.get("/getUsers", getUsers);
 
-router.get("/getAuthor", authorController.getAuthor);
-router.get("/getBooks", bookController.getBooks);
-router.get("/getPublisher", publisherController.getPublisher);
-
-router.put("/books", bookController.updateBookCover);
-router.put("/updatePrice", bookController.updatePrice);
+// routes for orders
+router.post("/createOrder", isFreeAppUser, createOrder);
+router.get("/getOrder", getOrder);
 
 module.exports = router;
