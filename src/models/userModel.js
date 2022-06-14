@@ -2,18 +2,20 @@ const mongoose = require("mongoose");
 
 const userSchema = new mongoose.Schema(
   {
-    name: String,
-    balance: {
-      type: Number,
-      default: 100,
+    firstName: String,
+    lastName: String,
+    mobile: {
+      type: String,
+      required: true,
     },
-    address: String,
-    age: Number,
+    emailId: String,
+    password: String,
     gender: {
       type: String,
       enum: ["male", "female", "other"],
     },
-    isFreeAppUser: {
+    age: Number,
+    isDeleted: {
       type: Boolean,
       default: false,
     },

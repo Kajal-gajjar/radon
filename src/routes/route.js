@@ -1,24 +1,21 @@
 const express = require("express");
-const {
-  createProduct,
-  getProduct,
-} = require("../controllers/productController");
-const { createUser, getUsers } = require("../controllers/userController");
-const { createOrder, getOrder } = require("../controllers/orderController");
-const { isFreeAppUser } = require("../middleware/middleware");
-
 const router = express.Router();
+const userController = require("../controllers/userController");
+const { userVerification } = require("../middleware/auth");
 
-// routes for products
-router.post("/createProduct", createProduct);
-router.get("/getProduct", getProduct);
+router.get("/test-me", function (req, res) {
+  res.send("My first ever api!");
+});
 
-// routes for users
-router.post("/createUser", isFreeAppUser, createUser);
-router.get("/getUsers", getUsers);
+router.post("/users", userController.createUser);
 
-// routes for orders
-router.post("/createOrder", isFreeAppUser, createOrder);
-router.get("/getOrder", getOrder);
+router.post("/login", userController.loginUser);
+
+//The userId is sent by front end
+router.get("/users/:userId", userVerification, userController.getUserData);
+
+router.put("/users/:userId", userVerification, userController.updateUser);
+
+router.delete("/users/:userId", userVerification, userController.deleteUser);
 
 module.exports = router;
