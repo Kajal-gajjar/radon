@@ -30,7 +30,7 @@ const createOrder = async function (req, res) {
     newOrder["amount"] = 0;
     response = await orderModel.create(newOrder);
   } else {
-    amount = product.price;
+    let amount = product.price;
     if (amount > user.balance) res.send("Insufficient Balance");
     else {
       user = await userModel
