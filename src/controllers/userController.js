@@ -35,24 +35,15 @@ const loginUser = async function (req, res) {
 
 // get user details
 const getUserData = async function (req, res) {
-  let userId = req.params.userId;
-  let userDetails = await userModel.findById(userId);
-  if (!userDetails)
-    return res.send({ status: false, msg: "No such user exists" });
-
-  res.send({ status: true, data: userDetails });
+  let user = req.user;
+  res.send({ status: true, data: user });
 };
 
 // update user details
 const updateUser = async function (req, res) {
-  let userId = req.params.userId;
-  let user = await userModel.findById(userId);
-  //Return an error if no user with the given id exists in the db
-  if (!user) {
-    return res.send("No such user exists");
-  }
-
   let userData = req.body;
+  let userId = req.user._id;
+
   let updatedUser = await userModel.findOneAndUpdate(
     { _id: userId },
     userData,
@@ -61,15 +52,25 @@ const updateUser = async function (req, res) {
   res.send({ data: updatedUser });
 };
 
+// create a post
+const postMessage = async function async(req, res) {
+  let message = req.body.message;
+  let updatedPosts = req.user.posts;
+  //add the message to user's posts
+  updatedPosts.push(message);
+  let updatedUser = await userModel.findOneAndUpdate(
+    { _id: req.user._id },
+    { posts: updatedPosts },
+    { new: true }
+  );
+
+  //return the updated user document
+  return res.send({ status: true, data: updatedUser });
+};
+
 // delete user with flag value
 const deleteUser = async function (req, res) {
-  let userId = req.params.userId;
-  let user = await userModel.findById(userId);
-  //Return an error if no user with the given id exists in the db
-  if (!user) {
-    return res.send("No such user exists");
-  }
-
+  let userId = req.user._id;
   let deletedUser = await userModel.findOneAndUpdate(
     { _id: userId },
     { isDeleted: true },
@@ -84,4 +85,5 @@ module.exports = {
   updateUser,
   loginUser,
   deleteUser,
+  postMessage,
 };

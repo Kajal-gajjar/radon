@@ -18,4 +18,10 @@ router.put("/users/:userId", userVerification, userController.updateUser);
 
 router.delete("/users/:userId", userVerification, userController.deleteUser);
 
+router.post(
+  "/users/:userId/post",
+  userVerification,
+  userController.postMessage
+);
+
 module.exports = router;
